@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Plan {
+  FREE
+  PRO
+}
+
+enum JobStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  name          String
+  email         String    @unique
+  password      String
+  role          Role      @default(USER)
+  plan          Plan      @default(FREE)
+  emailVerified Boolean   @default(false)
+  deletedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  reviews          Review[]
+  generatedResumes GeneratedResume[]
+  usageLogs        UsageLog[]
+}
+
+model Review {
+  id             Int       @id @default(autoincrement())
+  userId         Int
+  user           User      @relation(fields: [userId], references: [id])
+  resumeUrl      String
+  jobDescription String?
+  status         JobStatus @default(PENDING)
+  result         Json?
+  errorMessage   String?
+  createdAt      DateTime  @default(now())
+  completedAt    DateTime?
+
+  @@index([userId])
+}
+
+model GeneratedResume {
+  id               Int       @id @default(autoincrement())
+  userId           Int
+  user             User      @relation(fields: [userId], references: [id])
+  targetJobTitle   String?
+  jobDescription   String?
+  inputData        Json
+  generatedContent Json?
+  fileUrl          String?
+  status           JobStatus @default(PENDING)
+  createdAt        DateTime  @default(now())
+  completedAt      DateTime?
+
+  @@index([userId])
+}
+
+model UsageLog {
+  id     Int    @id @default(autoincrement())
+  userId Int
+  user   User   @relation(fields: [userId], references: [id])
+  type   String
+  date   String
+  count  Int    @default(0)
+
+  @@unique([userId, date, type])
+}
