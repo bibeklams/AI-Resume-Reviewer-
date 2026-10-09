@@ -2,6 +2,7 @@ import * as authService from "../service/auth.service.js";
 
 import type { Request, Response, NextFunction } from "express";
 import { env } from "../../../config/env.js";
+
 export const register = async (
   req: Request,
   res: Response,
@@ -25,6 +26,7 @@ export const register = async (
     next(error);
   }
 };
+
 export const login = async (
   req: Request,
   res: Response,
@@ -40,7 +42,6 @@ export const login = async (
       secure: env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: env.ACCESS_TOKEN_EXPIRY_SECONDS * 1000,
-      path: "/",
     });
 
     res.cookie("refreshToken", result.refreshToken, {
@@ -48,7 +49,6 @@ export const login = async (
       secure: env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: env.REFRESH_TOKEN_EXPIRY_SECONDS * 1000,
-      path: "/api/auth",
     });
 
     res.status(200).json({
