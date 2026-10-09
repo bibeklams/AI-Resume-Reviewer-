@@ -1,8 +1,8 @@
-import sendEmail from "../../utils/sendEmail.js";
+import sendEmail from "../../../utils/sendEmail.js";
 import {
   verifyEmailTemplate,
   verifyOtpTemplate,
-} from "../../templates/verifyEmail.js";
+} from "../../../templates/verifyEmail.js";
 
 interface EmailVerify {
   email: string;
@@ -17,7 +17,7 @@ export const sendVerificationEmail = async ({
 }: EmailVerify) => {
   await sendEmail({
     to: email,
-    subject: "Verify your ShopVerse account",
+    subject: "Verify your AI Resume Reviewer account",
     html: verifyEmailTemplate(name, otp),
   });
 };
@@ -29,7 +29,7 @@ export const sendResetPasswordEmail = async ({
 }: EmailVerify) => {
   await sendEmail({
     to: email,
-    subject: "Verify your ShopVerse account",
+    subject: "Verify your AI Resume Reviewer account",
     html: verifyOtpTemplate(name, otp),
   });
 };

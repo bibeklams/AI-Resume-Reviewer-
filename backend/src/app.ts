@@ -19,11 +19,5 @@ app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(cookieParser());
 
-app.get("/health", (req, res) => {
-  res.send("hello");
-});
-app.use((req, res) => {
-  res.status(404).json({ success: false, message: "Not found", data: null });
-});
 app.use(errorHandler);
 export default app;

@@ -1,18 +1,21 @@
 import bcrypt from "bcrypt";
 import * as authRepository from "../repository/auth.repositories.js";
-import { env } from "../../config/env.js";
+import { env } from "../../../config/env.js";
 import createError from "http-errors";
 import {
   generateAccessToken,
   generateRefreshToken,
-} from "../../utils/generateToken.js";
-import { generateOtp } from "../../utils/generateOtp.js";
+} from "../../../utils/generateToken.js";
+import { generateOtp } from "../../../utils/generateOtp.js";
 import {
   sendVerificationEmail,
   sendResetPasswordEmail,
 } from "../service/email.service.js";
-
-import redis from "../../config/redis.js";
+import {
+  checkOtpAttemptLimit,
+  recordFailedOtpAttempt,
+} from "../../../utils/otpAttemptLimit.js";
+import redis from "../../../config/redis.js";
 import jwt from "jsonwebtoken";
 
 export const register = async (data: {
@@ -78,7 +81,12 @@ export const verifyEmail = async (email: string, otp: string) => {
     throw createError(400, "Email already verified");
   }
 
-  const otpHash = await redis.get(`email-verification:${user.id}`);
+  const otpKey = `email-verification:${user.id}`;
+  const attemptsKey = `otp-attempts:email-verification:${user.id}`;
+
+  await checkOtpAttemptLimit(attemptsKey);
+
+  const otpHash = await redis.get(otpKey);
 
   if (!otpHash) {
     throw createError(400, "OTP expired or not found");
@@ -87,12 +95,13 @@ export const verifyEmail = async (email: string, otp: string) => {
   const isValidOtp = await bcrypt.compare(otp, otpHash);
 
   if (!isValidOtp) {
+    await recordFailedOtpAttempt(attemptsKey);
     throw createError(400, "Invalid OTP");
   }
 
   await authRepository.verifyEmail(user.id);
 
-  await redis.del(`email-verification:${user.id}`);
+  await redis.del(otpKey, attemptsKey);
 
   return "Email verified successfully";
 };

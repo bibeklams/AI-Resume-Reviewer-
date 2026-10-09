@@ -1,5 +1,4 @@
 import transporter from "../config/mailer.js";
-
 export interface SendEmailOptions {
   to: string;
   subject: string;
