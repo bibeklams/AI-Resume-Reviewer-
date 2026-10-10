@@ -35,14 +35,6 @@ export const protect = async (
     if (!user) {
       throw createError(404, "No user found");
     }
-
-    console.log("AUTH USER:", {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-      sellerStatus: user.sellerStatus,
-    });
-
     req.user = user;
 
     next();

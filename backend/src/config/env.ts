@@ -17,7 +17,8 @@ const envSchema = z.object({
   REFRESH_TOKEN_EXPIRY_SECONDS: z.coerce.number().positive(),
 
   REDIS_URL: z.string().min(1),
-
+  EMAIL_USER: z.string().min(1),
+  EMAIL_PASS: z.string(),
   // Cloudinary
   CLOUDINARY_CLOUD_NAME: z.string().min(1),
   CLOUDINARY_API_KEY: z.string().min(1),
