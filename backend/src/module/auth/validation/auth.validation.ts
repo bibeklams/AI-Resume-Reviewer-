@@ -82,3 +82,29 @@ export const changePasswordSchema = z.object({
       error: "Password must not exceed 128 characters",
     }),
 });
+
+// Reusable email validation
+export const emailSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .email("Please provide a valid email address")
+    .max(254, "Email is too long"),
+});
+
+// Email verification OTP
+export const verifyOtpSchema = z.object({
+  email: z.string().trim().email("Please provide a valid email address"),
+
+  otp: z.string().regex(/^\d{6}$/, "OTP must be exactly 6 digits"),
+});
+
+// Forgot password
+export const forgotPasswordSchema = emailSchema;
+
+// Verify password-reset OTP
+export const verifyResetOtpSchema = z.object({
+  email: z.string().trim().email("Please provide a valid email address"),
+
+  otp: z.string().regex(/^\d{6}$/, "OTP must be exactly 6 digits"),
+});
